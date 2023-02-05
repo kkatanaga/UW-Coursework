@@ -1,0 +1,10 @@
+void print_command_selection();
+void print_base_selection();
+void print_binary(int binary[]);
+void print_octal(int binary[]);
+void print_decimal(int binary[]);
+void print_hexadecimal(int binary[]);
+void print_binary_operation(int binaryOne[], char type[], int binaryTwo[]);
+void print_unary_operation(int binaryOne[], char type[]);
+void print_base(char base[]);
+void print_result(int binaryOne[], int binaryTwo[], int result[], int command, int base);

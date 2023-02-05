@@ -1,0 +1,4 @@
+run = ["bash", "compile.bash"]
+
+[nix]
+channel = "stable-22_11"

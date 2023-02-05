@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <string.h>
+
+#include "arithmetic.h"
+
+#define INPUT_VARIABLE_COUNT 3
+#define OUTPUT_VARIABLE_COUNT 1
+#define TRUTH_TABLE_ROW_COUNT 8
+
+void build_left_side(int truth_table[][INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT]){
+	int row[INPUT_VARIABLE_COUNT] = {};
+	int result[INPUT_VARIABLE_COUNT] = {};
+
+	//build the left side of truth table for all combinations of 1's and 0's
+	for(int i = 0; i < TRUTH_TABLE_ROW_COUNT - 1; i++){
+		//accessing the element of i-th row
+
+		//increment
+		func_increment(row, result);	// From arithmetic.c
+
+		//put into the next row: (i+1)-th row
+		for (int j = 0; j < INPUT_VARIABLE_COUNT; j++)
+			truth_table[i+1][j] = result[j];
+	}
+}
+
+void build_right_side(int truth_table[][INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT]){
+	char buffer;
+	//build the right side of truth table for the output variables
+	for (int i = 0; i < TRUTH_TABLE_ROW_COUNT; i++) {
+		//for each output variable F1, F2, ...
+		for (int j = INPUT_VARIABLE_COUNT; j < INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT; j++) {
+			printf("Row #%d of output F: ", i);
+			while( ( !scanf("%d", &truth_table[i][j]) && scanf(" %c", &buffer) ) || (truth_table[i][j] != 0 && truth_table[i][j] != 1) )  // Loops if input is neither 0 nor 1
+				printf("Error: Row #%d: ", i);
+		}
+	}
+}
+
+int main(void) {
+    setbuf(stdout, NULL);
+
+	int truth_table[TRUTH_TABLE_ROW_COUNT][INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT] = {};
+	const char variables[INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT] =  {'Z', 'Y', 'X', 'F'};
+
+	build_left_side(truth_table);
+
+	build_right_side(truth_table);
+
+    puts("-----------");             // Separates the result from the main menu
+
+	// Variable Header (Inputs)
+	for (int i = 0; i < INPUT_VARIABLE_COUNT - 1; i++)
+		printf("%c, ", variables[i]);															// Prints the variable header except the result variable and last input variable
+	printf("%c : ", variables[INPUT_VARIABLE_COUNT - 1]);										// Prints the last input variable
+
+	// Variable Header (Outputs)
+	for (int i = INPUT_VARIABLE_COUNT; i < INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT - 1; i++)
+		printf("%c, ", variables[i]);															// Prints the output variables except the last
+	printf("%c\n", variables[OUTPUT_VARIABLE_COUNT - 1]);										// Prints the last output variable
+
+    puts("-----------");             // Separates the result from the main menu
+
+	for (int i = 0; i < TRUTH_TABLE_ROW_COUNT; i++) {
+		// Inputs
+		for (int j = 0; j < INPUT_VARIABLE_COUNT - 1; j++)
+			printf("%d, ", truth_table[i][j]);													// Prints a row of binary except the rightmost digit
+		printf("%d : ", truth_table[i][INPUT_VARIABLE_COUNT - 1]);								// Prints the rightmost digit
+
+		// Outputs
+		for (int j = INPUT_VARIABLE_COUNT; j < INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT - 1; j++)
+			printf("%d", truth_table[i][j]);													// Prints a row of outputs except the last
+		printf("%d\n", truth_table[i][INPUT_VARIABLE_COUNT + OUTPUT_VARIABLE_COUNT - 1]);		// Prints the last output
+	}
+
+    puts("-----------");             // Separates the result from the main menu
+
+	char input;
+	printf("Press enter to exit...");
+	scanf("%c%c", &input, &input);
+}

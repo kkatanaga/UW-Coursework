@@ -1,0 +1,1 @@
+void to_binary(int decimal, int binary[]);
