@@ -1,2 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.jogamp.java3d.utils.image.TextureLoader"/>
+    <fullyQualifiedTypeName name="org.jogamp.java3d.Node"/>
+    <fullyQualifiedTypeName name="org.jogamp.java3d.BranchGroup"/>
+    <fullyQualifiedTypeName name="org.jogamp.java3d.Shape3D"/>
+</qualifiedTypeNameHistroy>
