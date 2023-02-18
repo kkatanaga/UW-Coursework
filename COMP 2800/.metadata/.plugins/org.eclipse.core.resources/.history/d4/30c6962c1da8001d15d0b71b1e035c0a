@@ -1,9 +1,0 @@
-package codesKK280;
-
-public class RingObjectsKK {
-	private int number;
-	
-	public RingObjectsKK() {
-		number = 0;
-	}
-}
