@@ -1,0 +1,66 @@
+package codesKK280;
+
+import java.awt.BorderLayout;
+import java.awt.GraphicsConfiguration;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.jogamp.java3d.*;
+import org.jogamp.java3d.utils.geometry.Box;
+import org.jogamp.java3d.utils.universe.SimpleUniverse;
+import org.jogamp.vecmath.*;
+
+public class Assignment3KK extends JPanel {
+	private static final long serialVersionUID = 1L;
+	private static JFrame frame;
+	
+	/* a function to build the content branch */
+	public static BranchGroup create_Scene() {
+		BranchGroup sceneBG = new BranchGroup();           						// create the scene's BranchGroup
+		
+		TransformGroup sceneTG = new ConcentricRing(CommonsKK.Orange, CommonsKK.Black).position_Object();	// create the scene's TransformGroup
+		
+		Color3f baseColor = CommonsKK.Orange;
+		TransformGroup baseTG = new CylinderShapes(baseColor).position_Object();// creates 4 cylinder shapes with transformation as children of baseTG
+		Appearance appearance = CommonsKK.obj_Appearance(baseColor);			// color of boxes; same as cylinders
+		baseTG.addChild(new Box(0.5f, 0.1f, 1.0f, appearance));					// 1 x 0.2 x 2 box
+		baseTG.addChild(new Box(1.0f, 0.1f, 0.5f, appearance));					// 2 x 0.2 x 1 box
+		baseTG.addChild(new StringShape("KK's Assignment 3").position_Object());// stringTG
+		
+		TransformGroup ringsTG = (TransformGroup) ((TransformGroup) sceneTG.getChild(0)).getChild(0);			// Get reference to TG of large ring
+		ringsTG.addChild(baseTG);												// 4 cylinders and 2 boxes
+		
+		sceneTG.addChild(new ChangeBackground().position_Object());
+		
+		sceneBG.addChild(CommonsKK.add_Lights(CommonsKK.White, 1));				// SceneGraphA1.jpg doesn't include it, but lights are required
+//		sceneBG.addChild(CommonsKK.rotate_Behavior(17500, sceneTG));	
+		sceneBG.addChild(sceneTG);                         						// make 'sceneTG' continuous rotating
+		sceneBG.addChild(new AxesShape().position_Object());					// /!\ Part of Lab1KK; creates the x, y, z axes /!\
+		return sceneBG;
+	}
+
+	/* NOTE: Keep the constructor for each of the labs and assignments */
+	public Assignment3KK(BranchGroup sceneBG) {
+		GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
+		Canvas3D canvas = new Canvas3D(config);
+		
+		SimpleUniverse su = new SimpleUniverse(canvas);    // create a SimpleUniverse
+		CommonsKK.define_Viewer(su, new Point3d(4.0d, -0.8d, 3.0d));
+		
+		sceneBG.addChild(CommonsKK.key_Navigation(su));    // allow key navigation
+		sceneBG.compile();		                           // optimize the BranchGroup
+		su.addBranchGraph(sceneBG);                        // attach the scene to SimpleUniverse
+
+		setLayout(new BorderLayout());
+		add("Center", canvas);
+		frame.setSize(800, 800);                           // set the size of the JFrame
+		frame.setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		frame = new JFrame("KK's Assignment 3");
+		frame.getContentPane().add(new Assignment3KK(create_Scene()));  // create an instance of the class
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+}

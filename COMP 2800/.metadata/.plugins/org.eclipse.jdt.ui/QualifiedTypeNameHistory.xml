@@ -5,4 +5,5 @@
     <fullyQualifiedTypeName name="org.jogamp.java3d.Shape3D"/>
     <fullyQualifiedTypeName name="org.jogamp.java3d.utils.image.TextureLoader"/>
     <fullyQualifiedTypeName name="org.jogamp.vecmath.Color3f"/>
+    <fullyQualifiedTypeName name="org.jogamp.java3d.RotationInterpolator"/>
 </qualifiedTypeNameHistroy>

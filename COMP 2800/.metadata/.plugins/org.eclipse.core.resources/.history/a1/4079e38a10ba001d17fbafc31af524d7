@@ -1,0 +1,126 @@
+package codesKK280;
+
+import java.io.FileNotFoundException;
+
+import org.jogamp.java3d.Alpha;
+import org.jogamp.java3d.BranchGroup;
+import org.jogamp.java3d.Node;
+import org.jogamp.java3d.RotationInterpolator;
+import org.jogamp.java3d.Shape3D;
+import org.jogamp.java3d.Transform3D;
+import org.jogamp.java3d.TransformGroup;
+import org.jogamp.java3d.loaders.IncorrectFormatException;
+import org.jogamp.java3d.loaders.ParsingErrorException;
+import org.jogamp.java3d.loaders.Scene;
+import org.jogamp.java3d.loaders.objectfile.ObjectFile;
+import org.jogamp.vecmath.Color3f;
+import org.jogamp.vecmath.Vector3f;
+
+public abstract class RingObjectsKK {
+	public abstract Node position_Object();
+	protected BranchGroup load_Object(String fileName) {				// implemented the method in the abstract class since it does the same thing for each ring
+		Scene s = null;
+		String directory = "src/codesKK280/objects/" + fileName + ".obj";
+		
+		int flags = ObjectFile.RESIZE | ObjectFile.TRIANGULATE | ObjectFile.STRIPIFY;
+		ObjectFile f = new ObjectFile(flags, (float) (60 * Math.PI / 180.0));
+		try {
+			s = f.load(directory);
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (ParsingErrorException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (IncorrectFormatException e) {
+			System.err.println(e);
+			System.exit(1);
+		}
+		
+		return s.getSceneGroup();
+	}
+}
+
+class ConcentricRing extends RingObjectsKK {
+	private TransformGroup concentricTG;
+	
+	public ConcentricRing(Color3f colorOne, Color3f colorTwo) {
+		Transform3D translation = new Transform3D();
+		translation.setTranslation(new Vector3f(0f, 0.065f, 0f));					// Center everything based on the outermost ring
+		concentricTG = new TransformGroup(translation);
+		
+		TransformGroup centrRingTG = new RingShape(0.6f, new Vector3f(0f,  0.000f, -0.017f), "Centr", colorTwo).position_Object();	// Center ring
+		TransformGroup smallRingTG = new RingShape(0.7f, new Vector3f(0f, -0.002f, -0.03441f), "Small", colorOne).position_Object();	// Small ring
+		TransformGroup largeRingTG = new RingShape(0.9f, new Vector3f(0f,  0.000f, -0.02315f), "Large", colorTwo).position_Object();	// Large ring
+		TransformGroup outerRingTG = new RingShape(1.0f, new Vector3f(0f, -0.066f, -0.01750f), "Outer", colorOne).position_Object(); 	// Outer ring
+		
+		TransformGroup centrRingSTG = new TransformGroup();
+		TransformGroup smallRingSTG = new TransformGroup();							// Will contain the ring TG and rotation behavior of said ring
+		TransformGroup largeRingSTG = new TransformGroup();							// S stands for Super; Super Transform Group
+		TransformGroup outerRingSTG = new TransformGroup();	
+		
+		centrRingSTG.addChild(centrRingTG);
+		smallRingSTG.addChild(smallRingTG);											// Add TG to their corresponding STGs
+		largeRingSTG.addChild(largeRingTG);											// i.e., the TG that holds small ring (smallRingTG) has parent smallRingSTG
+		outerRingSTG.addChild(outerRingTG);
+		
+		Transform3D yAxis = new Transform3D();
+		Transform3D xAxis = new Transform3D();
+		
+		xAxis.rotZ(-Math.PI / 2.0);													// rotate on x axis
+		
+		centrRingSTG.addChild(rotate_Object(1500, centrRingTG, xAxis));				// Add x axis rotation to center ring
+//		smallRingSTG.addChild(rotate_Object(3000, smallRingTG, yAxis));				// Add y axis rotation to small ring
+//		largeRingSTG.addChild(rotate_Object(4500, largeRingTG, xAxis));				// Add x axis rotation to large ring
+//		outerRingSTG.addChild(rotate_Object(6000, outerRingTG, yAxis));				// Add y axis rotation to outer ring
+		
+		TransformGroup smallRingCTG = (TransformGroup) smallRingTG.getChild(0);		// C stands for Child; Child Transform Group
+		TransformGroup largeRingCTG = (TransformGroup) largeRingTG.getChild(0);		// The CTG holds the scaling for the next ring
+		TransformGroup outerRingCTG = (TransformGroup) outerRingTG.getChild(0);		// which is why there is no centrRingCTG
+		
+		smallRingCTG.addChild(centrRingSTG);										// Center ring inherits small ring's scale and rotations but not their translation
+		largeRingCTG.addChild(smallRingSTG);										// Center and Small ring inherits Large ring's scale and rotations but not their translation
+		outerRingCTG.addChild(largeRingSTG);										// Center, Small, and Large ring inherits Outer ring's scale and rotation but not their translation
+				
+		concentricTG.addChild(outerRingSTG);										// concentricTG will reference the TG that holds the concentric rings 
+																					// and base with transformations and rotations applied
+	}
+	public TransformGroup position_Object() {
+		return concentricTG;
+	}
+	protected RotationInterpolator rotate_Object(int rot_rate, TransformGroup shapeTG, Transform3D axis) {
+		shapeTG.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+		Alpha rotationAlpha = new Alpha(-1, rot_rate);
+		
+		RotationInterpolator rot_beh = new RotationInterpolator(rotationAlpha, shapeTG, axis, 0.0f, (float) Math.PI * 2.0f);
+		rot_beh.setSchedulingBounds(CommonsKK.hundredBS);
+		return rot_beh;
+	}
+}
+
+class RingShape extends RingObjectsKK {												// loads a Ring.obj
+	private TransformGroup ringTG;                          						// use 'objTG' to position an object
+	
+	public RingShape(float scale, Vector3f translate, String ring, Color3f clr) {
+		ringTG = new TransformGroup();
+		
+		BranchGroup ringBG = load_Object(ring);										// load ring based on names (Outer, Large, Small, Centr)
+		Shape3D ringShape = (Shape3D) ringBG.getChild(0);
+		ringShape.setAppearance(CommonsKK.obj_Appearance(clr));
+		
+		Transform3D translator = new Transform3D();
+		translator.setTranslation(translate);										// translate based on input
+		TransformGroup translateTG = new TransformGroup(translator);				// centers the ring
+		translateTG.addChild(ringBG);
+		
+		Transform3D scaler = new Transform3D();
+		scaler.setScale(scale);														// scale based on input
+		TransformGroup scaleTG = new TransformGroup(scaler);						// scales down the ring before centering
+		scaleTG.addChild(translateTG);
+		
+		ringTG.addChild(scaleTG);													// ringTG will be referenced by a rotation behavior elsewhere
+	}
+	public TransformGroup position_Object() {
+		return ringTG;
+	}
+}
