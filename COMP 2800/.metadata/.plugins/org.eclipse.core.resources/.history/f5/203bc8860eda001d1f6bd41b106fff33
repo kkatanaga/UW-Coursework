@@ -1,0 +1,91 @@
+package codesKK280;
+
+/* Copyright material for students taking COMP-2800 to work on assignment/labs/projects/exam. */
+
+import java.awt.BorderLayout;
+import java.awt.GraphicsConfiguration;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.jogamp.java3d.*;
+import org.jogamp.java3d.utils.universe.*;
+import org.jogamp.vecmath.*;
+
+
+public class FinalCodeKK extends JPanel implements KeyListener {
+	
+	private static final long serialVersionUID = 1L;
+	private static JFrame frame;
+	
+	private static final int OBJ_NUM = 4;                  // track four cup components
+	private static Cup cup;
+
+	/* a function to build the content branch */
+	private static BranchGroup create_Scene() {
+		BranchGroup sceneBG = new BranchGroup();
+		
+		cup = new Cup();									// contains moving walls
+		TransformGroup cupTG = cup.getTG();
+		cupTG.addChild(new CupBase().position_Object());	// add base to tg of walls
+		sceneBG.addChild(cupTG);
+		
+		return sceneBG;
+	}
+
+	/* NOTE: Keep the constructor for each of the labs and assignments */
+	public FinalCodeKK(BranchGroup sceneBG) {
+		GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
+		Canvas3D canvas = new Canvas3D(config);
+		
+		canvas.addKeyListener(this);						// allow program to listen to key inputs
+		
+		SimpleUniverse su = new SimpleUniverse(canvas);    // create a SimpleUniverse
+		CommonsKK.define_Viewer(su, new Point3d(1.0d, 2.0d, 4.0d));
+		
+		sceneBG.addChild(CommonsKK.add_Lights(CommonsKK.White, 1));
+		sceneBG.compile();		                           // optimize the BranchGroup
+		su.addBranchGraph(sceneBG);                        // attach the scene to SimpleUniverse
+
+		setLayout(new BorderLayout());
+		add("Center", canvas);
+		frame.setSize(800, 800);                           // set the size of the JFrame
+		frame.setVisible(true);
+	}
+
+	public static void main(String[] args) {
+		frame = new JFrame("KK's Final Exam");             // NOTE: change XY to student's initials
+		frame.getContentPane().add(new FinalCodeKK(create_Scene()));  // create an instance of the class
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int key = e.getKeyCode();
+		
+		// Name = Keigo
+		// ID = 110068805
+		
+		switch(key) {
+		case KeyEvent.VK_K:		// c1 = k
+			cup.flip1();
+			break;
+		case KeyEvent.VK_E:		// c2 = e
+			cup.flip2();
+			break;
+		case KeyEvent.VK_0:		// c3 = 0
+			cup.flip3();
+			break;
+		case KeyEvent.VK_5: 	// c4 = 5
+			cup.flip4();
+			break;
+		}
+	}
+	public void keyTyped(KeyEvent e) {}
+	public void keyReleased(KeyEvent e) {}
+}
+
+
+

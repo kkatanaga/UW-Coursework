@@ -1,0 +1,123 @@
+package DogFight;
+
+import java.io.*;
+
+import org.jogamp.java3d.Appearance;
+import org.jogamp.java3d.BranchGroup;
+import org.jogamp.java3d.ImageComponent2D;
+import org.jogamp.java3d.Material;
+import org.jogamp.java3d.Shape3D;
+import org.jogamp.java3d.Texture;
+import org.jogamp.java3d.Texture2D;
+import org.jogamp.java3d.TransformGroup;
+import org.jogamp.java3d.loaders.IncorrectFormatException;
+import org.jogamp.java3d.loaders.ParsingErrorException;
+import org.jogamp.java3d.loaders.Scene;
+import org.jogamp.java3d.loaders.objectfile.ObjectFile;
+import org.jogamp.java3d.utils.image.TextureLoader;
+import org.jogamp.vecmath.Color3f;
+
+public class Fighter {
+	private TransformGroup mainTG;		// Holds everything in the Fighter class; this will be referenced by the DogFight class
+	
+	private String fighterName = "insert_name";
+	private BranchGroup planeBG;
+	// add more private fields when needed
+	
+	public Fighter() {
+		// add transformations such as translations and scales and pass into the following TransformGroup() if needed
+		mainTG = new TransformGroup();
+		
+		// Load plane object  /!\ Change "plane" to whatever the plane .obj name is
+		planeBG = new Plane("su-47").getPlaneBG();		// Holds the plane. Plane could be made up of just 1 Shape3D, or multiple.
+		mainTG.addChild(planeBG);
+	}
+	// Loads a .obj file; copied from the assignments
+	
+	public TransformGroup get_Fighter() {
+		return mainTG;
+	}
+}
+
+class Plane {
+	private Scene s;
+	private BranchGroup planeBG;
+	
+	public Plane(String planeFileName) {
+		String directory = "src/DogFight/planes/" + planeFileName + ".obj";
+		
+//		int flags = ObjectFile.RESIZE | ObjectFile.TRIANGULATE | ObjectFile.STRIPIFY;
+//		ObjectFile f = new ObjectFile(flags, (float) (60 * Math.PI / 180.0));
+		File file = new File(directory);
+		ObjectFile loader = new ObjectFile();
+		
+		try {
+			s = loader.load(file.toURI().toURL());
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (ParsingErrorException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (IncorrectFormatException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (Exception e) {
+			System.err.println(e);
+			System.exit(1);
+		}
+		planeBG = s.getSceneGroup();
+		setAppearance(true);
+	}
+	public Plane() {
+		this("Harrier");
+	}
+	protected void setAppearance(boolean textured) {
+		Appearance app = getAppearance();
+		
+		if (textured) {
+			Texture2D texture = getTexture("metal");
+			app.setTexture(texture);
+		}
+		
+		int shape_count = planeBG.numChildren();
+		System.out.println("Shape count: " + shape_count);
+		((Shape3D) planeBG.getChild(1)).setAppearance(app);
+//		for (int i = 0; i < shape_count; ++i) {						// set every part of the object with the same color/texture
+//			((Shape3D) planeBG.getChild(i)).setAppearance(app);		// set object part's appearance
+//		}
+	}
+	private Appearance getAppearance() {
+		Material mtl = new Material();
+		Appearance app = new Appearance();
+		int shine = 32;
+		mtl.setShininess(shine);
+		mtl.setAmbientColor(new Color3f(1f, 1f, 1f));                   			// use them to define different materials
+		mtl.setDiffuseColor(new Color3f(0f, 0f, 0f));
+		mtl.setSpecularColor(new Color3f(0.175000f, 0.175000f, 0.175000f));
+		mtl.setEmissiveColor(new Color3f(0f, 0f, 0f));                  			// use it to enlighten a button
+		mtl.setLightingEnable(true);
+
+		app.setMaterial(mtl);                              			// set appearance's material
+		return app;
+	}
+	private Texture2D getTexture(String name) {
+		String filename = "src/DogFight/images/" + name + ".jpg";
+		TextureLoader loader = new TextureLoader(filename, null);
+		ImageComponent2D image = loader.getImage();
+		if (image == null)
+			System.out.println("Cannot open file: " + filename);
+		
+		Texture2D texture = new Texture2D(Texture.BASE_LEVEL, Texture.RGBA, image.getWidth(), image.getHeight());
+		texture.setImage(0, image);
+		return texture;
+	}
+	public Scene getPlaneScene() {
+		return s;
+	}
+	public BranchGroup getPlaneBG() {
+		return planeBG;
+	}
+}
+
+

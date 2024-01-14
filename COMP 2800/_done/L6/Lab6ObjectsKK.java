@@ -159,11 +159,11 @@ class BladesObjectA extends Lab6ObjectsKK {
 	protected void obj_Appearance() {
 		super.obj_Appearance();										// apply initial appearance before modifying
 		Appearance new_app = new Appearance();						// define "FanBlades" handle's material attributes
-		Material new_mtl = (Material) mtl.cloneNodeComponent(true);
+		Material new_mtl = new Material();
 		
 		new_mtl.setDiffuseColor(new Color3f(0.3f, 0.15f, 0.3f));	// use a different color
 		
-		new_app.setMaterial(mtl);                              		// set new appearance's material
+		new_app.setMaterial(new_mtl);                              		// set new appearance's material
 		
 		((Shape3D) objBG.getChild(5)).setAppearance(new_app);		// set "FanBlades" handle to a new appearance
 	}	

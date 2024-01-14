@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="Blades"/>
+		<item key="selection" value="4"/>
 		<item key="wrap" value="true"/>
-		<item key="casesensitive" value="false"/>
+		<item key="casesensitive" value="true"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="Blades"/>
-			<item value="Shaft"/>
-			<item value="XY"/>
-			<item value="Lab6XY"/>
-			<item value="images"/>
-			<item value="Lab5"/>
-			<item value="Lab5KK"/>
-			<item value="Assignment2ShapesKK"/>
-			<item value="Assignment2"/>
-			<item value="Assignment2KK"/>
-			<item value="Lab4ShapesKK"/>
-			<item value="Lab4"/>
-			<item value="Lab4KK"/>
-			<item value="background"/>
-			<item value="Assignment1"/>
+			<item value="1"/>
+			<item value="cup3D"/>
+			<item value="tg"/>
+			<item value="posTG"/>
+			<item value=""/>
+			<item value="CommonsXY"/>
+			<item value="FinalCodeXY"/>
+			<item value="FinalShapesXY"/>
+			<item value="true"/>
+			<item value="serialVersionUID"/>
+			<item value="playerType"/>
+			<item value="explosionSound"/>
+			<item value="engineSound"/>
+			<item value="ps.setInitialGain"/>
+			<item value="bulletBG"/>
 		</list>
 		<list key="replacehistory">
-			<item value="Guard"/>
-			<item value="Motor"/>
-			<item value="KK"/>
-			<item value=""/>
-			<item value="Lab6KK"/>
-			<item value="Lab6"/>
-			<item value="Assignment3ShapesKK"/>
-			<item value="Assignment3"/>
-			<item value="Assignment3KK"/>
-			<item value="Lab5ShapesKK"/>
-			<item value="Lab5"/>
-			<item value="Lab5KK"/>
-			<item value="Assignment2"/>
-			<item value="Lab4"/>
+			<item value="4"/>
+			<item value="3"/>
+			<item value="2"/>
+			<item value="walls"/>
+			<item value="tgs"/>
+			<item value="objPG"/>
+			<item value=" "/>
+			<item value="CommonsKK"/>
+			<item value="FinalCodeKK"/>
+			<item value="FinalShapesKK"/>
+			<item value="false"/>
+			<item value="planePos"/>
+			<item value="Assignment5"/>
+			<item value="toURI().toURL()"/>
+			<item value="rButtonSwitch"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
@@ -47,5 +48,9 @@
 		<item key="DIALOG_WIDTH" value="322"/>
 		<item key="DIALOG_HEIGHT" value="391"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="724"/>
+		<item key="DIALOG_Y_ORIGIN" value="396"/>
 	</section>
 </section>

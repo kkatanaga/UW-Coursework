@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move 4 elements to &apos;Comp2800KK/src/DogFight&apos;&#x0D;&#x0A;- Original project: &apos;Comp2800KK&apos;&#x0D;&#x0A;- Destination element: &apos;Comp2800KK/src/DogFight&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     codesKK280.Environment.java&#x0D;&#x0A;     codesKK280.DFCommons.java&#x0D;&#x0A;     codesKK280.DogFight.java&#x0D;&#x0A;     codesKK280.Fighter.java&#x0D;&#x0A;- Update references to refactored element" description="Move compilation units" destination="/src&lt;DogFight" element1="/src&lt;codesKK280{Environment.java" element2="/src&lt;codesKK280{DFCommons.java" element3="/src&lt;codesKK280{DogFight.java" element4="/src&lt;codesKK280{Fighter.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" patterns="*" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1678204162218" units="4" version="1.0"/>
+</session>

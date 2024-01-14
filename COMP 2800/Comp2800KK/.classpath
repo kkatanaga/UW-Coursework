@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-19">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
 			<attribute name="add-exports" value="java.base/java.lang=ALL-UNNAMED:java.desktop/sun.awt=ALL-UNNAMED:java.desktop/sun.java2d=ALL-UNNAMED"/>
@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="C:/Jars4Java3D/j3dutils.jar"/>
 	<classpathentry kind="lib" path="C:/Jars4Java3D/jogamp-fat.jar"/>
 	<classpathentry kind="lib" path="C:/Jars4Java3D/vecmath.jar"/>
+	<classpathentry kind="lib" path="C:/Jars4Java3D/kryonet-2.21-all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

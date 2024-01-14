@@ -1,0 +1,237 @@
+package codesKK280;
+
+/* Copyright material for students taking COMP-2800 to work on assignment/labs/projects/exam. */
+
+import java.io.FileNotFoundException;
+
+import org.jogamp.java3d.Alpha;
+import org.jogamp.java3d.Appearance;
+import org.jogamp.java3d.BranchGroup;
+import org.jogamp.java3d.PolygonAttributes;
+import org.jogamp.java3d.PositionInterpolator;
+import org.jogamp.java3d.Shape3D;
+import org.jogamp.java3d.Transform3D;
+import org.jogamp.java3d.TransformGroup;
+import org.jogamp.java3d.TransparencyAttributes;
+import org.jogamp.java3d.loaders.IncorrectFormatException;
+import org.jogamp.java3d.loaders.ParsingErrorException;
+import org.jogamp.java3d.loaders.Scene;
+import org.jogamp.java3d.loaders.objectfile.ObjectFile;
+import org.jogamp.vecmath.Color3f;
+import org.jogamp.vecmath.Vector3d;
+
+/* a super class for the definition of external objects */
+public abstract class FinalShapesKK {
+	private BranchGroup objBG;                             // load external object to 'objBG'
+	private TransformGroup objTG;                          // use 'objTG' to resize an object
+	private TransformGroup objPG;							// use 'rotTG' to contain position interpolator
+	protected Vector3d scale;                              // use it to change the size of objects
+	private Shape3D obj_shape;
+	
+	private Appearance normlApp;							// Appearance without transparency
+	private Appearance clearApp;							// Appearance with transparency
+	private boolean clear = false;							// true if object is transparent
+	
+	private Alpha alpha;									// Use to enable/disable movement
+	
+	/* a function to attach the current object to 'objTG' and return 'objTG' */ 
+	public TransformGroup position_Object() {
+		return objPG;
+	}
+
+    /* a function to set 'objTG' and load external object to 'objBG' with appearance setting */
+	protected void load_Object(String obj_name, Color3f obj_clr) {
+		Transform3D scaler = new Transform3D();
+		scaler.setScale(scale);
+		objPG = new TransformGroup();
+		objTG = new TransformGroup(scaler);
+		objBG = load_Shape(obj_name);                      // load external object to 'objBG'
+		
+		objPG.addChild(objTG);
+		objTG.addChild(objBG);
+		
+		obj_shape = (Shape3D) objBG.getChild(0);   // convert to Shape3D to set object's appearance
+		normlApp = CommonsKK.obj_Appearance(obj_clr);
+		
+		clearApp = CommonsKK.obj_Appearance(obj_clr);
+		TransparencyAttributes ta = new TransparencyAttributes(TransparencyAttributes.BLENDED, 0.3f);	// 30% transparency
+		clearApp.setTransparencyAttributes(ta);
+		PolygonAttributes pa = new PolygonAttributes();
+		pa.setCullFace(PolygonAttributes.CULL_BACK);
+		clearApp.setPolygonAttributes(pa);
+		
+		if (obj_name.equals("cup_base")) {	// Base uses transparent appearance by default
+			obj_shape.setAppearance(clearApp);
+		}
+		else {
+			obj_shape.setAppearance(normlApp);
+			if (!obj_name.equals("cup_wall0"))
+				move_Object();
+		}
+		obj_shape.setCapability(Shape3D.ALLOW_APPEARANCE_READ);
+		obj_shape.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
+	}
+
+	/* a function to load and return object shape from the file named 'obj_name' */
+	private BranchGroup load_Shape(String obj_name) {
+		ObjectFile f = new ObjectFile(ObjectFile.RESIZE, (float) (60 * Math.PI / 180.0));
+		Scene s = null;
+		try {                                              // load object's definition file to 's'
+			s = f.load("src/codesKK280/objects/" + obj_name + ".obj");
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (ParsingErrorException e) {
+			System.err.println(e);
+			System.exit(1);
+		} catch (IncorrectFormatException e) {
+			System.err.println(e);
+			System.exit(1);
+		}
+		return s.getSceneGroup();
+	}
+	
+	private void move_Object() {
+		objPG.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+		alpha = new Alpha(-1, Alpha.INCREASING_ENABLE | Alpha.DECREASING_ENABLE, 0, 0, 4000, 2000, 1000, 4000, 2000, 1000);
+		Transform3D axisPosition = new Transform3D();
+		axisPosition.rotZ(Math.PI / 2.0);
+		PositionInterpolator posInterpol = new PositionInterpolator(alpha, objPG, axisPosition, 0f, 0.375f);
+		posInterpol.setSchedulingBounds(CommonsKK.hundredBS);
+		
+		objPG.addChild(posInterpol);
+	}
+	public void flip_Alpha() {
+		if (alpha.isPaused()) alpha.resume();
+		else alpha.pause();
+	}
+	public void flip_Transparent() {
+		if (clear)
+			obj_shape.setAppearance(normlApp);
+		else
+			obj_shape.setAppearance(clearApp);
+		clear = !clear;
+	}
+	public boolean isClear() {
+		return clear;
+	}
+	public boolean isMoving() {
+		return !alpha.isPaused();
+	}
+}
+
+class Cup {
+	private FinalShapesKK[] walls;
+	private TransformGroup rootTG;
+	private boolean baseClear = false;
+	
+	public Cup() {
+		walls = new FinalShapesKK[5];
+		TransformGroup[] tgs = new TransformGroup[5];
+		walls[0] = new CupWall0(); 
+		walls[1] = new CupWall1(); 
+		walls[2] = new CupWall2();  
+		walls[3] = new CupWall3(); 
+		walls[4] = new CupWall4();
+		
+		for (int i = 0; i < 5; ++i) {
+			tgs[i] = walls[i].position_Object();
+			if (i > 0)
+				tgs[i-1].addChild(tgs[i]);
+		}
+		
+		Transform3D trfm = new Transform3D();
+		trfm.setTranslation(new Vector3d(0, -0.5, 0));
+		rootTG = new TransformGroup(trfm);
+		rootTG.addChild(tgs[0]);
+	}
+	public TransformGroup getTG() {
+		return rootTG;
+	}
+	public void flip1() {
+		walls[1].flip_Alpha();			// If moving, stop. If stopped, move.
+		walls[1].flip_Transparent();	// If transparent, set to non-transparent. If non-transparent, set to transparent.
+		checkTransparency();
+	}
+	public void flip2() {
+		walls[2].flip_Alpha();
+		walls[2].flip_Transparent();
+		checkTransparency();
+	}
+	public void flip3() {
+		walls[3].flip_Alpha();
+		walls[3].flip_Transparent();
+		checkTransparency();
+	}
+	public void flip4() {
+		walls[4].flip_Alpha();
+		walls[4].flip_Transparent();
+		checkTransparency();
+	}
+	private void checkTransparency() {
+		if (baseClear) {													// if base is transparent
+			baseClear = !baseClear;
+			for (int i = 0; i < 5; ++i) {
+				if (i > 0 && !walls[i].isMoving()) walls[i].flip_Alpha();	// set the wall moving unless it's the base or is already moving
+				if (walls[i].isClear()) walls[i].flip_Transparent();		// set the wall opaque unless it's already opaque
+			}
+			return;
+		} 
+		
+		boolean setTransparency = true;
+		for (int i = 1; i < 5; ++i) {
+			setTransparency = setTransparency && walls[i].isClear();
+		}
+		if (setTransparency) {										// if we need to set base as transparent
+			walls[0].flip_Transparent();
+			baseClear = setTransparency;
+		}
+	}
+}
+/* a derived class for the cup's base object */
+class CupBase extends FinalShapesKK {
+	public CupBase() {
+		scale = new Vector3d(0.8, 0.8, 0.8);               // set scaling for transformation
+		load_Object("cup_base", new Color3f(0.35f, 0.35f, 0.35f)); // light grey
+	}
+}
+
+/* a derived class for the innermost segment of cup wells */
+class CupWall0 extends FinalShapesKK {
+	public CupWall0() {
+		scale = new Vector3d(0.42, 0.42, 0.42);            // set scaling for transformation
+		load_Object("cup_wall0", new Color3f(0.35f, 0.0f, 0.35f)); // light magenta
+	}
+}
+
+/* a derived class for the 1st segment of cup wells */
+class CupWall1 extends FinalShapesKK {
+	public CupWall1() {
+		scale = new Vector3d(0.4662, 0.4662, 0.4662);      // set scaling for transformation
+		load_Object("cup_wall1", new Color3f(0.35f, 0.15f, 0.0f)); // light orange
+	}
+}
+
+/* a derived class for the 2nd segment of cup wells */
+class CupWall2 extends FinalShapesKK {
+	public CupWall2() {
+		scale = new Vector3d(0.5175, 0.5175, 0.5175);      // set scaling for transformation
+		load_Object("cup_wall2", new Color3f(0.35f, 0.35f, 0.0f)); // light yellow
+	}
+}
+
+/* a derived class for the 3rd segment of cup wells */
+class CupWall3 extends FinalShapesKK {
+	public CupWall3() {
+		scale = new Vector3d(0.5744, 0.5744, 0.5744);      // set scaling for transformation
+		load_Object("cup_wall3", new Color3f(0.0f, 0.35f, 0.0f)); // light green
+	}
+}
+
+/* a derived class for the 4th segment of cup wells */
+class CupWall4 extends FinalShapesKK {
+	public CupWall4() {
+		scale = new Vector3d(0.6376, 0.6376, 0.6376);      // set scaling for transformation
+		load_Object("cup_wall4", new Color3f(0.0f, 0.0f, 0.35f)); // light blue
+	}
+}
